@@ -4,6 +4,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { oauthRouter, checkBearerToken } from "./oauth.js";
 import { registerTools } from "./tools.js";
 import { planHtml } from "./plan.js";
+import { handleDiscover } from "./discover.js";
 
 const PORT = Number(process.env.PORT ?? 8787);
 const PUBLIC_URL = process.env.PUBLIC_URL ?? `http://localhost:${PORT}`;
@@ -31,6 +32,7 @@ function newServer() {
 
 app.post("/mcp", async (req, res) => {
   if (!checkBearerToken(req.header("authorization"))) return unauthorized(res);
+  if (req.body?.method === "server/discover") return handleDiscover(req, res);
   const server = newServer();
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   res.on("close", () => {
