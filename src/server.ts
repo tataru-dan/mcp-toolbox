@@ -11,8 +11,8 @@ const PORT = Number(process.env.PORT ?? 8787);
 const PUBLIC_URL = process.env.PUBLIC_URL ?? `http://localhost:${PORT}`;
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 app.use(oauthRouter);
 app.use("/uploads", express.static("public/uploads"));
