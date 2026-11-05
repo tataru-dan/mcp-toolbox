@@ -7,7 +7,7 @@ import { memos } from "./store.js";
 
 const PUBLIC_URL = process.env.PUBLIC_URL ?? "http://localhost:8787";
 const UPLOAD_DIR = "public/uploads";
-const GROQ_API_KEY = process.env.GROQ_API_KEY ?? "";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ?? "";
 
 export function registerTools(server: McpServer) {
   server.registerTool(
@@ -91,22 +91,22 @@ export function registerTools(server: McpServer) {
 }
 
 async function transcribeUrl(url: string): Promise<{ start: number; text: string }[]> {
-  if (!GROQ_API_KEY) throw new Error("Server has no GROQ_API_KEY configured.");
+  if (!OPENROUTER_API_KEY) throw new Error("Server has no OPENROUTER_API_KEY configured.");
   const audioRes = await fetch(url);
   if (!audioRes.ok) throw new Error(`Could not fetch audio: ${audioRes.status}`);
   const audioBlob = await audioRes.blob();
 
   const form = new FormData();
   form.set("file", audioBlob, "audio");
-  form.set("model", "whisper-large-v3-turbo");
+  form.set("model", "openai/whisper-1");
   form.set("response_format", "verbose_json");
 
-  const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
+  const res = await fetch("https://openrouter.ai/api/v1/audio/transcriptions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${GROQ_API_KEY}` },
+    headers: { Authorization: `Bearer ${OPENROUTER_API_KEY}` },
     body: form,
   });
-  if (!res.ok) throw new Error(`Groq transcription failed: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new Error(`OpenRouter transcription failed: ${res.status} ${await res.text()}`);
   const data = (await res.json()) as { segments?: { start: number; text: string }[] };
   return (data.segments ?? []).map((s) => ({ start: s.start, text: s.text.trim() }));
 }

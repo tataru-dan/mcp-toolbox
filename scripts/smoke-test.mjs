@@ -87,10 +87,17 @@ async function main() {
   await rpc("tools/list", {});
   await rpc("tools/call", { name: "memo_write", arguments: { text: "hello from smoke test" } });
   await rpc("tools/call", { name: "memo_search", arguments: { query: "hello" } });
-  await rpc("tools/call", {
+  const uploadResult = await rpc("tools/call", {
     name: "upload",
     arguments: { filename: "note.txt", contentBase64: Buffer.from("hi there").toString("base64") },
   });
+
+  if (process.env.TEST_TRANSCRIBE_URL) {
+    await rpc("tools/call", {
+      name: "transcribe",
+      arguments: { url: process.env.TEST_TRANSCRIBE_URL },
+    });
+  }
 }
 
 main().catch((err) => {

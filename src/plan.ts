@@ -11,7 +11,7 @@ export function planHtml(publicUrl: string): string {
     <li><strong>memo_write</strong> — saves a note. Input: <code>{ text }</code>. Result: <code>{ id }</code>.</li>
     <li><strong>memo_search</strong> — finds notes whose text contains a query. Input: <code>{ query }</code>. Result: <code>{ notes: [{ id, text, createdAt }] }</code>.</li>
     <li><strong>upload</strong> — stores a file and returns a public link. Input: <code>{ filename, contentBase64 }</code>. Result: <code>{ url }</code>.</li>
-    <li><strong>transcribe</strong> — turns audio at a URL into timestamped text (via Groq Whisper). Input: <code>{ url }</code>. Result: <code>{ segments: [{ start, text }] }</code>.</li>
+    <li><strong>transcribe</strong> — turns audio at a URL into timestamped text (via OpenRouter's Whisper). Input: <code>{ url }</code>. Result: <code>{ segments: [{ start, text }] }</code>.</li>
   </ul>
 
   <h2>Sign-in</h2>
@@ -26,7 +26,7 @@ export function planHtml(publicUrl: string): string {
   <ul>
     <li>Notes written with <code>memo_write</code> are kept indefinitely, as plain text, until deleted by the operator.</li>
     <li>Uploaded files are kept on the server's disk and served back at a public link; they are not scanned or transformed.</li>
-    <li>Transcription audio is sent to Groq's API for processing and is not stored by this server beyond the request.</li>
+    <li>Transcription audio is sent to OpenRouter's API for processing and is not stored by this server beyond the request.</li>
     <li>Issued OAuth access tokens are stored so clients stay authorized across server restarts; there is no token expiry or revocation UI yet.</li>
   </ul>
 </body>
