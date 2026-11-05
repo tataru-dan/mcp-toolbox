@@ -32,7 +32,7 @@ function newServer() {
 }
 
 app.post("/mcp", async (req, res) => {
-  if (!checkBearerToken(req.header("authorization"))) return unauthorized(res);
+  if (!(await checkBearerToken(req.header("authorization")))) return unauthorized(res);
   if (req.body?.method === "server/discover") return handleDiscover(req, res);
   if (isModernRequest(req)) return handleModernRequest(req, res);
   const server = newServer();
@@ -45,8 +45,8 @@ app.post("/mcp", async (req, res) => {
   await transport.handleRequest(req, res, req.body);
 });
 
-app.get("/mcp", (req, res) => {
-  if (!checkBearerToken(req.header("authorization"))) return unauthorized(res);
+app.get("/mcp", async (req, res) => {
+  if (!(await checkBearerToken(req.header("authorization")))) return unauthorized(res);
   res.status(405).json({ error: "method_not_allowed" });
 });
 

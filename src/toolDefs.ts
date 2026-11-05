@@ -70,7 +70,7 @@ export const toolDefs: ToolDef[] = [
       additionalProperties: false,
     },
     handler: async ({ text }) => {
-      const memo = memos.write(String(text));
+      const memo = await memos.write(String(text));
       return {
         content: [{ type: "text", text: `Saved memo ${memo.id}` }],
         structuredContent: { id: memo.id },
@@ -108,7 +108,7 @@ export const toolDefs: ToolDef[] = [
       additionalProperties: false,
     },
     handler: async ({ query }) => {
-      const notes = memos.search(String(query));
+      const notes = await memos.search(String(query));
       return {
         content: [{ type: "text", text: `Found ${notes.length} note(s).` }],
         structuredContent: { notes },

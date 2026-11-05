@@ -45,13 +45,13 @@ oauthRouter.get("/.well-known/oauth-authorization-server", (_req, res) => {
 
 // Dynamic client registration (RFC 7591) — any client may register; it still
 // needs the owner's approval at /authorize before it gets a token.
-oauthRouter.post("/register", (req, res) => {
+oauthRouter.post("/register", async (req, res) => {
   const { client_name, redirect_uris } = req.body ?? {};
   if (!Array.isArray(redirect_uris) || redirect_uris.length === 0) {
     res.status(400).json({ error: "invalid_client_metadata", error_description: "redirect_uris required" });
     return;
   }
-  const client = clients.register(client_name ?? "unnamed client", redirect_uris);
+  const client = await clients.register(client_name ?? "unnamed client", redirect_uris);
   res.status(201).json({
     client_id: client.clientId,
     client_name: client.clientName,
@@ -60,9 +60,9 @@ oauthRouter.post("/register", (req, res) => {
   });
 });
 
-oauthRouter.get("/authorize", (req, res) => {
+oauthRouter.get("/authorize", async (req, res) => {
   const { client_id, redirect_uri, state, code_challenge, code_challenge_method } = req.query;
-  const client = clients.get(String(client_id ?? ""));
+  const client = await clients.get(String(client_id ?? ""));
   if (!client || !client.redirectUris.includes(String(redirect_uri ?? ""))) {
     res.status(400).send("Unknown client or redirect_uri.");
     return;
@@ -111,7 +111,7 @@ oauthRouter.post("/authorize/approve", (req, res) => {
   res.redirect(url.toString());
 });
 
-oauthRouter.post("/token", (req, res) => {
+oauthRouter.post("/token", async (req, res) => {
   const { grant_type, code, redirect_uri, client_id, code_verifier } = req.body ?? {};
   if (grant_type !== "authorization_code") {
     res.status(400).json({ error: "unsupported_grant_type" });
@@ -128,12 +128,12 @@ oauthRouter.post("/token", (req, res) => {
     res.status(400).json({ error: "invalid_grant", error_description: "PKCE verification failed" });
     return;
   }
-  const token = tokens.issue(pending.clientId);
+  const token = await tokens.issue(pending.clientId);
   res.json({ access_token: token, token_type: "bearer" });
 });
 
-export function checkBearerToken(authHeader: string | undefined): boolean {
+export async function checkBearerToken(authHeader: string | undefined): Promise<boolean> {
   const token = authHeader?.match(/^Bearer (.+)$/i)?.[1];
   if (!token) return false;
-  return Boolean(tokens.check(token));
+  return Boolean(await tokens.check(token));
 }

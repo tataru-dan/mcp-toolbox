@@ -24,10 +24,10 @@ export function planHtml(publicUrl: string): string {
 
   <h2>Data kept</h2>
   <ul>
-    <li>Notes written with <code>memo_write</code> are kept indefinitely, as plain text, until deleted by the operator.</li>
-    <li>Uploaded files are kept on the server's disk and served back at a public link; they are not scanned or transformed.</li>
+    <li>Notes, registered OAuth clients, and issued access tokens are kept in a private GitHub Gist (not local disk), so they survive server restarts and redeploys, until deleted by the operator.</li>
+    <li>Uploaded files are kept on the server's disk and served back at a public link; they are not scanned or transformed. They do not survive a redeploy.</li>
     <li>Transcription audio is sent to OpenRouter's API for processing and is not stored by this server beyond the request.</li>
-    <li>Issued OAuth access tokens are stored so clients stay authorized across server restarts; there is no token expiry or revocation UI yet.</li>
+    <li>Issued OAuth access tokens have no expiry or revocation UI yet.</li>
   </ul>
 </body>
 </html>`;

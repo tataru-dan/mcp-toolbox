@@ -12,3 +12,7 @@ services:
         sync: false
       - key: PUBLIC_URL
         sync: false
+      - key: GIST_ID
+        sync: false
+      - key: GIST_TOKEN
+        sync: false
