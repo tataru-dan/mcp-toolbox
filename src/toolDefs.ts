@@ -28,7 +28,11 @@ export interface ToolDef {
 async function transcribeUrl(url: string): Promise<{ start: number; text: string }[]> {
   if (!OPENROUTER_API_KEY) throw new Error("Server has no OPENROUTER_API_KEY configured.");
   const audioRes = await fetch(url);
-  if (!audioRes.ok) throw new Error(`Could not fetch audio: ${audioRes.status}`);
+  if (!audioRes.ok) throw new Error(`Could not fetch audio at ${url}: HTTP ${audioRes.status}`);
+  const contentType = audioRes.headers.get("content-type") ?? "";
+  if (!contentType.startsWith("audio/") && !contentType.startsWith("video/") && contentType !== "application/octet-stream") {
+    throw new Error(`The URL ${url} did not return audio (got content-type '${contentType}').`);
+  }
   const audioBlob = await audioRes.blob();
 
   const form = new FormData();
@@ -41,7 +45,7 @@ async function transcribeUrl(url: string): Promise<{ start: number; text: string
     headers: { Authorization: `Bearer ${OPENROUTER_API_KEY}` },
     body: form,
   });
-  if (!res.ok) throw new Error(`OpenRouter transcription failed: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new Error(`Transcription of ${url} failed: HTTP ${res.status} ${await res.text()}`);
   const data = (await res.json()) as { segments?: { start: number; text: string }[] };
   return (data.segments ?? []).map((s) => ({ start: s.start, text: s.text.trim() }));
 }
