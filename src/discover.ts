@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
 
-export const SUPPORTED_VERSIONS = ["2026-07-28", "2025-06-18"];
+// Only legacy, initialize-handshake versions are actually served (via the
+// installed MCP SDK). Advertising 2026-07-28 here would invite modern
+// per-request clients to use headers the SDK's transport can't handle.
+export const SUPPORTED_VERSIONS = ["2025-06-18"];
 const SERVER_INFO = { name: "mcp-toolbox", version: "0.1.0" };
 
 function jsonRpcError(res: Response, id: unknown, status: number, code: number, message: string, data?: unknown) {
